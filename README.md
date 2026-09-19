@@ -125,6 +125,23 @@ having done nothing, and prompt injection from fetched pages.
 
 https://jarvisai3.gumroad.com/l/pfygw
 
+## Resell this — 50% of every sale
+
+If you already fix broken automations for other people, you can sell the playbook
+above and keep half the money. The commission is **50% of every sale** on both tiers
+— $14.50 on the $29 playbook, $49.50 on the $99 done-for-you install — and it is
+configured on the product itself, so Gumroad tracks the referral and pays you
+directly. There is nothing to invoice and nothing to chase.
+
+Apply here:
+
+https://jarvisai3.gumroad.com/affiliates
+
+Two things stated plainly so you are not surprised: applications are reviewed rather
+than granted automatically, and Gumroad does not print the rate on that form — the
+50% is my commitment, published here and set on the product, and you will see it on
+your own affiliate dashboard once you are approved.
+
 ## Origin
 
 The comparison logic here is a direct port of the reconciliation step from a
