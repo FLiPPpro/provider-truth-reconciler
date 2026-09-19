@@ -1,0 +1,11 @@
+{
+  "statusCode": 200,
+  "body": [
+    {"idempotency_key": "run-1001", "recipient": "a@example.com", "our_status": "success", "at": "2026-09-18T00:04:11Z"},
+    {"idempotency_key": "run-1002", "recipient": "b@example.com", "our_status": "success", "at": "2026-09-18T00:11:02Z"},
+    {"idempotency_key": "run-1003", "recipient": "c@example.com", "our_status": "success", "at": "2026-09-18T00:19:47Z"},
+    {"idempotency_key": "run-1004", "recipient": "d@example.com", "our_status": "success", "at": "2026-09-18T00:28:30Z"},
+    {"idempotency_key": "run-1005", "recipient": "e@example.com", "our_status": "success", "at": "2026-09-18T00:36:09Z"},
+    {"recipient": "f@example.com", "our_status": "success", "at": "2026-09-18T00:44:55Z"}
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "statusCode": 200,
+  "body": {
+    "data": [
+      {"idempotency_key": "run-1001", "status": "delivered", "provider_id": "msg_aa01"},
+      {"idempotency_key": "run-1002", "status": "bounced", "provider_id": "msg_aa02"},
+      {"idempotency_key": "run-1004", "provider_id": "msg_aa04"},
+      {"idempotency_key": "run-1005", "status": "accepted", "provider_id": "msg_aa05"},
+      {"idempotency_key": "run-0999", "status": "delivered", "provider_id": "msg_z999"}
+    ]
+  }
+}
