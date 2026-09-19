@@ -111,14 +111,19 @@ The hard part is rarely the comparison — it is working out which endpoint is
 actually authoritative for your provider, what your real join key is, and which
 provider statuses genuinely mean "done".
 
-Done-for-you install, $99: I take one of your scheduled automations, wire this
-against the right provider endpoint, tune the join key and accept-states to your
-stack, and hand it back as a working diff plus the first exception report from your
-real data.
+This tool came out of the **Agentic Cron Playbook** — 14 production patterns for
+running LLM agents unattended on a schedule. Provider-truth reconciliation is one of
+them; the others cover retry storms, double-charging cron ticks, jobs that exit 0
+having done nothing, and prompt injection from fetched pages.
+
+- **$29 — playbook only (self-serve).** The 14 patterns as copy-paste code. You do
+  your own wiring.
+- **$99 — done-for-you install.** I take one of your scheduled agents, apply the
+  patterns to it — including wiring this reconciler against the right provider
+  endpoint and tuning the join key and accept-states to your stack — and hand it
+  back as a working diff, plus the first exception report from your real data.
 
 https://jarvisai3.gumroad.com/l/pfygw
-
-The same page has a $29 self-serve tier if you would rather do the wiring yourself.
 
 ## Origin
 
