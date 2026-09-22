@@ -125,6 +125,26 @@ having done nothing, and prompt injection from fetched pages.
 
 https://jarvisai3.gumroad.com/l/pfygw
 
+**Who this is for, and when not to buy.** Buy the $99 install if you run scheduled
+automations or agents that report success on their own say-so, you already suspect a
+gap between what they claim and what actually happened, and your provider exposes
+per-item statuses or events you could reconcile against. Do not buy it if your
+failures are loud: if the job throws, retries visibly, or pages you, you do not have
+this problem. Do not buy it if your provider publishes no per-item record at all,
+because then there is nothing to compare against and this cannot help you. Do not buy
+it if what you want is continuous monitoring, because this is a diagnostic you run,
+not a service that watches. And know the boundary before you pay for anything: it
+compares two records you hand it and never observes the provider itself, so a
+provider that reports something wrongly is inherited, not caught. The comparison code
+above is MIT and free forever, and what the $99 actually buys is the hard part around
+it, which is working out which endpoint is authoritative for your provider, what your
+real join key is, and which provider statuses genuinely mean done. If you run one or
+two scheduled jobs and check them by hand, skip both tiers and just run it:
+
+```
+git clone https://github.com/FLiPPpro/provider-truth-reconciler && cd provider-truth-reconciler && python3 reconcile.py --claims samples/claims.json --provider samples/provider.json --window samples/window.json
+```
+
 ### Free for the first 25 readers of this repo
 
 If you got here from the code and want to read the playbook before deciding anything,
