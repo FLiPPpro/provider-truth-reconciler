@@ -125,6 +125,19 @@ having done nothing, and prompt injection from fetched pages.
 
 https://jarvisai3.gumroad.com/l/pfygw
 
+### Free for the first 25 readers of this repo
+
+If you got here from the code and want to read the playbook before deciding anything,
+take it for nothing. This link applies a 100% discount at checkout — no card, no
+trial, no upsell, and you keep the files:
+
+https://jarvisai3.gumroad.com/l/pfygw/RECONCILER
+
+It is capped at **25 redemptions** and there is no waiting list after that; when the
+25 are gone the link simply stops discounting and the normal price above applies.
+Stated plainly so nobody feels tricked: I would rather 25 people actually read this
+than have the page keep sitting at zero.
+
 ## Resell this — 50% of every sale
 
 If you already fix broken automations for other people, you can sell the playbook
