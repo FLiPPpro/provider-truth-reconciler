@@ -65,7 +65,7 @@ sent=None accepted=None delta=None unknown=6
 
 It does not report zero failures. It reports that it does not know.
 
-## The five states
+## The six states
 
 | State | Meaning |
 |---|---|
@@ -74,6 +74,7 @@ It does not report zero failures. It reports that it does not know.
 | `UNKNOWN` (no key) | The claim carries no idempotency key, so provider truth cannot be looked up in either direction. |
 | `UNKNOWN` (ambiguous) | The provider returned a matching row with no interpretable status. Ambiguity is not confirmation. |
 | `UNKNOWN` (orphan) | The provider has an event you never claimed — a duplicate send, a retry, or a run whose record you lost. |
+| `UNKNOWN` (stale) | The provider confirmed, but its record is older than the claim's `claimed_at`, or carries no timestamp to prove otherwise. A provider that dedupes on the idempotency key hands a re-run the *first* attempt's record, so "confirmed" there means something this run never did. Only applied when the claim carries `claimed_at`. Reported by [DuskWatch](https://community.n8n.io/t/313710/2) — thank you. |
 
 Exit codes: `0` reconciled · `1` exceptions found · `2` the window could not be read.
 Suitable for a cron job or a CI step.
@@ -93,6 +94,9 @@ that varies between stacks:
 --claim-path / --provider-path   dotted path to the rows (default: body)
 --claim-key  / --provider-key    the join key  (default: idempotency_key)
 --accept-states                  comma list (default: delivered,accepted,succeeded,confirmed,paid)
+--claimed-at-field               claim field for when this attempt started (default: claimed_at)
+--provider-time-fields           provider timestamp fields, tried in order
+                                 (default: created_at,timestamp,occurred_at,created,sent_at)
 --json                           emit the full machine-readable report
 ```
 

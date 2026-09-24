@@ -16,6 +16,31 @@ import sys
 from datetime import datetime, timezone
 
 ACCEPT_STATES = ["delivered", "accepted", "succeeded", "confirmed", "paid"]
+PROVIDER_TIME_FIELDS = ["created_at", "timestamp", "occurred_at", "created", "sent_at"]
+
+
+def parse_time(value):
+    """ISO-8601 string or unix epoch (s or ms) -> aware UTC datetime, else None."""
+    if value is None or isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        secs = value / 1000.0 if value > 1e12 else float(value)
+        try:
+            return datetime.fromtimestamp(secs, tz=timezone.utc)
+        except (OverflowError, OSError, ValueError):
+            return None
+    if isinstance(value, str):
+        text = value.strip()
+        if text.endswith("Z"):
+            text = text[:-1] + "+00:00"
+        try:
+            parsed = datetime.fromisoformat(text)
+        except ValueError:
+            return None
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc)
+    return None
 
 
 def dig(obj, path):
@@ -45,7 +70,8 @@ def as_rows(value):
 def reconcile(claim_response, provider_response, window,
               claim_path="body", provider_path="body",
               claim_key="idempotency_key", provider_key="idempotency_key",
-              accept_states=None):
+              accept_states=None, claimed_at_field="claimed_at",
+              provider_time_fields=None):
     """Return the exception report for one reconciliation window.
 
     claim_response   -- what YOUR system logged as a success
@@ -53,6 +79,7 @@ def reconcile(claim_response, provider_response, window,
     window           -- {"window_start", "window_end", "provider_name"}
     """
     accept = [s.lower() for s in (accept_states or ACCEPT_STATES)]
+    time_fields = provider_time_fields or PROVIDER_TIME_FIELDS
 
     claim_status = claim_response.get("statusCode")
     provider_status = provider_response.get("statusCode")
@@ -139,6 +166,42 @@ def reconcile(claim_response, provider_response, window,
         if raw_state is None:
             raw_state = dig(event, "state")
         state = str(raw_state).lower() if raw_state is not None else ""
+
+        # Confirmed-but-stale (reported by DuskWatch): a provider that dedupes on the
+        # idempotency key returns the FIRST attempt's record to a re-run. If the claim
+        # carries claimed_at, a confirming record must be provably from this attempt.
+        claimed_at_raw = dig(claim, claimed_at_field) if claimed_at_field else None
+        if state in accept and claimed_at_raw is not None:
+            claimed_at = parse_time(claimed_at_raw)
+            record_raw = None
+            for field in time_fields:
+                record_raw = dig(event, field)
+                if record_raw is not None:
+                    break
+            record_time = parse_time(record_raw)
+            why = None
+            if claimed_at is None:
+                why = "Claim has an unparseable %s (%r), so the provider record cannot be " \
+                      "shown to belong to this attempt." % (claimed_at_field, claimed_at_raw)
+            elif record_time is None:
+                why = "Provider confirmed, but the record carries no readable timestamp, so " \
+                      "it cannot be shown to be newer than %s %s. It may be a previous " \
+                      "attempt's record returned by idempotency dedupe." % (
+                          claimed_at_field, claimed_at_raw)
+            elif record_time < claimed_at:
+                why = "Provider record (%s) is OLDER than this claim's %s (%s): confirmed " \
+                      "but stale, likely an earlier attempt returned by idempotency dedupe. " \
+                      "This run did not do it." % (record_raw, claimed_at_field, claimed_at_raw)
+            if why is not None:
+                unknown += 1
+                records.append({
+                    "idempotency_key": key,
+                    "state": "UNKNOWN",
+                    "why": why,
+                    "provider_evidence": event,
+                    "our_claim": claim,
+                })
+                continue
 
         if state in accept:
             accepted += 1
@@ -236,6 +299,11 @@ def main(argv=None):
     parser.add_argument("--claim-key", default="idempotency_key")
     parser.add_argument("--provider-key", default="idempotency_key")
     parser.add_argument("--accept-states", default=",".join(ACCEPT_STATES))
+    parser.add_argument("--claimed-at-field", default="claimed_at",
+                        help="claim field holding when this attempt started; a confirming "
+                             "provider record older than it (or without a timestamp) is UNKNOWN")
+    parser.add_argument("--provider-time-fields", default=",".join(PROVIDER_TIME_FIELDS),
+                        help="provider record timestamp fields, tried in order")
     parser.add_argument("--json", action="store_true", help="emit the full report as JSON")
     args = parser.parse_args(argv)
 
@@ -251,6 +319,8 @@ def main(argv=None):
         claim_path=args.claim_path, provider_path=args.provider_path,
         claim_key=args.claim_key, provider_key=args.provider_key,
         accept_states=[s.strip() for s in args.accept_states.split(",") if s.strip()],
+        claimed_at_field=args.claimed_at_field,
+        provider_time_fields=[s.strip() for s in args.provider_time_fields.split(",") if s.strip()],
     )
 
     if args.json:
